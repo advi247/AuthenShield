@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AuthenShield - Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron&family=Roboto&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+<body>
+    <div class="overlay"></div>
+    <div class="container">
+        <h1>🛡️ AuthenShield</h1>
+        <h2>Human vs Bot Detection</h2>
+        <p class="description">Experience real-time behavioral authentication using biometrics and movement intelligence.</p>
+        <button id="start-button">🚀 Start Detection</button>
+
+        <div id="loader" class="loader" style="display: none;"></div>
+        <div id="results" class="output-box"></div>
+    </div>
+</body>
+</html>

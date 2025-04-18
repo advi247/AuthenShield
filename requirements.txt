@@ -1,0 +1,6 @@
+pynput
+mediapipe
+opencv-python
+joblib
+scikit-learn
+numpy
