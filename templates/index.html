@@ -5,18 +5,95 @@
     <title>AuthenShield - Detection</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron&family=Roboto&display=swap" rel="stylesheet">
-    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
 <body>
     <div class="overlay"></div>
     <div class="container">
         <h1>🛡️ AuthenShield</h1>
         <h2>Human vs Bot Detection</h2>
-        <p class="description">Experience real-time behavioral authentication using biometrics and movement intelligence.</p>
+        <p class="description">Experience real-time behavioral authentication using passive user analysis</p>
+
         <button id="start-button">🚀 Start Detection</button>
 
         <div id="loader" class="loader" style="display: none;"></div>
         <div id="results" class="output-box"></div>
+
+        <!-- 🕵️ Honeypot Form -->
+        <form id="feedbackForm" method="POST" action="/submit-form">
+            <input type="text" name="name" placeholder="Your Name" required>
+            <input type="email" name="email" placeholder="Your Email" required>
+
+            <!-- Honeypot field (hidden from users) -->
+            <div style="display: none;">
+                <label>Leave this field blank</label>
+                <input type="text" name="website" autocomplete="off">
+            </div>
+
+            <button type="submit">Submit Feedback</button>
+        </form>
     </div>
+
+    <!-- ⌨️ JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const button = document.getElementById('start-button');
+            const resultsDiv = document.getElementById('results');
+            const loader = document.getElementById('loader');
+
+            // ⏱️ Keystroke logging with delay measurement
+            let keyLog = [];
+            let lastKeyTime = null;
+
+            document.addEventListener('keydown', function (event) {
+                const now = Date.now();
+                const delay = lastKeyTime ? now - lastKeyTime : 0;
+
+                keyLog.push({
+                    key: event.key,
+                    code: event.code,
+                    timestamp: now,
+                    delay: delay
+                });
+
+                lastKeyTime = now;
+
+                if (keyLog.length >= 20) {
+                    fetch('/log-keystrokes', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ log: keyLog })
+                    }).then(() => {
+                        keyLog = [];
+                    }).catch(err => {
+                        console.error("❌ Failed to send keystrokes:", err);
+                    });
+                }
+            });
+
+            // 🧠 Bot detection trigger
+            button.addEventListener('click', function () {
+                button.disabled = true;
+                button.innerText = 'Detecting...';
+                resultsDiv.innerText = 'Running detection... please wait.';
+                loader.style.display = 'block';
+
+                fetch('/run-detection')
+                    .then(response => response.json())
+                    .then(data => {
+                        const output = data.output.join('\n');
+                        resultsDiv.innerText = output;
+                        button.disabled = false;
+                        button.innerText = 'Start Detection';
+                        loader.style.display = 'none';
+                    })
+                    .catch(error => {
+                        resultsDiv.innerText = 'Error: ' + error;
+                        button.disabled = false;
+                        button.innerText = 'Start Detection';
+                        loader.style.display = 'none';
+                    });
+            });
+        });
+    </script>
 </body>
 </html>
